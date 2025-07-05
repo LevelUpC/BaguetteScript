@@ -1,4 +1,3 @@
-````markdown
 # Baguette Script
 
 **Baguette Script** est un langage de programmation conçu entièrement en français, offrant une approche intuitive et accessible à la programmation. Oubliez la barrière de la langue et codez dans votre langue maternelle avec des mots-clés familiers et une syntaxe claire.
@@ -123,4 +122,3 @@ Alternativement, si vous avez le fichier `.vsix` :
 2.  Cliquez sur les trois points `...` en haut à droite.
 3.  Sélectionnez "Install from VSIX...".
 4.  Naviguez jusqu'à votre fichier `.vsix` et sélectionnez-le.
-````
