@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Exécuter Baguette Script",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "${fileDirname}/baguette.py",
+        "${file}"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

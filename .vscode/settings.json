@@ -1,0 +1,25 @@
+{
+  "files.associations": {
+    "*.bgsc": "baguette"
+  },
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "keyword.baguette",
+        "settings": { "foreground": "#e06c75", "fontStyle": "bold" }
+      },
+      {
+        "scope": "string.quoted.double.baguette",
+        "settings": { "foreground": "#98c379" }
+      },
+      {
+        "scope": "comment.line.baguette",
+        "settings": { "foreground": "#5c6370", "fontStyle": "italic" }
+      },
+      {
+        "scope": "constant.numeric.baguette",
+        "settings": { "foreground": "#d19a66" }
+      }
+    ]
+  }
+}

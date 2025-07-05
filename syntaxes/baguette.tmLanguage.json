@@ -1,0 +1,12 @@
+{
+  "name": "Baguette Script",
+  "fileTypes": ["bgsc"],
+  "scopeName": "source.baguette",
+  "patterns": [
+    { "match": "\\b(var|montrer|écrire|fonction|fin|tantque|faire|si|sinon|sinon si|importer|pour|de|à)\\b", "name": "keyword.baguette" },
+    { "match": "\\b(et|ou|non)\\b", "name": "keyword.operator.baguette" },
+    { "match": "#.*", "name": "comment.line.baguette" },
+    { "match": "\".*?\"", "name": "string.quoted.double.baguette" },
+    { "match": "\\b[0-9]+\\b", "name": "constant.numeric.baguette" }
+  ]
+}
