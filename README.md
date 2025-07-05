@@ -25,7 +25,7 @@ Voici un aperçu de la syntaxe de Baguette Script :
 var x = 5
 var nom = "Jean"
 x = x + 2
-````
+```
 
 ### Affichage Console
 
@@ -123,3 +123,4 @@ Alternativement, si vous avez le fichier `.vsix` :
 2.  Cliquez sur les trois points `...` en haut à droite.
 3.  Sélectionnez "Install from VSIX...".
 4.  Naviguez jusqu'à votre fichier `.vsix` et sélectionnez-le.
+````
