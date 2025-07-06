@@ -25,7 +25,7 @@ def interpreter_lignes(lignes):
             i += 1
             continue
 
-        # Import Python
+        # Importer un module Python
         if ligne.startswith("importer "):
             nom_module = ligne.split(" ")[1].strip()
             try:
@@ -86,7 +86,7 @@ def interpreter_lignes(lignes):
             variables[nom.strip()] = evaluer_expression(valeur)
 
         # Affectation
-        elif "=" in ligne and not ligne.startswith(("tantque ", "pour ")):
+        elif "=" in ligne and not ligne.startswith(("tantque ", "pour ", "avec ")):
             nom, valeur = ligne.split(" = ")
             variables[nom.strip()] = evaluer_expression(valeur)
 
@@ -95,7 +95,7 @@ def interpreter_lignes(lignes):
             contenu = ligne.split(" ", 1)[1]
             print(evaluer_expression(contenu))
 
-        # Tantque
+        # tantque
         elif ligne.startswith("tantque "):
             condition = ligne[8:].split(" faire")[0]
             bloc = []
@@ -106,7 +106,7 @@ def interpreter_lignes(lignes):
             while evaluer_expression(condition):
                 interpreter_lignes(bloc)
 
-        # POUR ... DE ... À ...
+        # pour i de ... à ...
         elif re.match(r"pour\s+\w+\s+de\s+.+\s+à\s+.+\s+faire", ligne):
             match = re.match(r"pour\s+(\w+)\s+de\s+(.+?)\s+à\s+(.+?)\s+faire", ligne)
             var_name = match.group(1)
@@ -124,7 +124,7 @@ def interpreter_lignes(lignes):
             i += 1
             continue
 
-        # POUR ... DANS ...
+        # pour x dans liste
         elif re.match(r"pour\s+\w+\s+dans\s+\w+\s+faire", ligne):
             match = re.match(r"pour\s+(\w+)\s+dans\s+(\w+)\s+faire", ligne)
             var_name = match.group(1)
@@ -146,7 +146,24 @@ def interpreter_lignes(lignes):
             i += 1
             continue
 
-        # Fonction
+        # avec ... comme ... faire
+        elif re.match(r"avec\s+(.+?)\s+comme\s+(\w+)\s+faire", ligne):
+            match = re.match(r"avec\s+(.+?)\s+comme\s+(\w+)\s+faire", ligne)
+            contexte_expr = match.group(1)
+            var_name = match.group(2)
+            bloc = []
+            i += 1
+            while lignes[i].strip() != "fin":
+                bloc.append(lignes[i])
+                i += 1
+            with eval(evaluer_expression(contexte_expr)) as ctx:
+                variables[var_name] = ctx
+                interpreter_lignes(bloc)
+                del variables[var_name]
+            i += 1
+            continue
+
+        # fonction
         elif ligne.startswith("fonction "):
             nom_fct = re.findall(r"fonction\s+(\w+)", ligne)[0]
             params = re.findall(r"\((.*?)\)", ligne)
@@ -159,7 +176,7 @@ def interpreter_lignes(lignes):
                 i += 1
             fonctions[nom_fct] = (params, bloc)
 
-        # Appel de fonction
+        # appel de fonction
         elif "(" in ligne and ")" in ligne:
             nom_fct = ligne.split("(")[0]
             args = ligne.split("(", 1)[1].rstrip(")").split(",")
