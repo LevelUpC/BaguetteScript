@@ -1,1 +1,3 @@
-montrer "Bonjour le monde"
+# Démo Baguette Script
+var nom = "Luc" #Création de variable
+montrer "Bonjour " + nom #Affiche Bonjour Luc dans la console
