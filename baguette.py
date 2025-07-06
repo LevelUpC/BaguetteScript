@@ -17,12 +17,15 @@ def evaluer_expression(expr):
 
 def interpreter_lignes(lignes):
     i = 0
-    pile_blocs = []
 
     while i < len(lignes):
         ligne = lignes[i].strip()
 
-                # Importer un module Python
+        if ligne == "" or ligne.startswith("#"):
+            i += 1
+            continue
+
+        # --- Import de modules Python ---
         if ligne.startswith("importer "):
             nom_module = ligne.split(" ")[1].strip()
             try:
@@ -32,62 +35,67 @@ def interpreter_lignes(lignes):
             i += 1
             continue
 
-        if ligne == "" or ligne.startswith("#"):
+        # --- Bloc conditionnel : si / sinon si / sinon / fin ---
+        if ligne.startswith("si "):
+            bloc_complet = [ligne]
             i += 1
+            while i < len(lignes) and lignes[i].strip() != "fin":
+                bloc_complet.append(lignes[i])
+                i += 1
+            i += 1  # passer "fin"
+
+            bloc_exécuté = False
+            j = 0
+            while j < len(bloc_complet):
+                ligne_cond = bloc_complet[j].strip()
+
+                if ligne_cond.startswith("si "):
+                    condition = ligne_cond[3:].split(" alors")[0]
+                    if evaluer_expression(condition):
+                        j += 1
+                        while j < len(bloc_complet) and not bloc_complet[j].strip().startswith(("sinon si", "sinon")):
+                            interpreter_lignes([bloc_complet[j]])
+                            j += 1
+                        bloc_exécuté = True
+                        break
+
+                elif ligne_cond.startswith("sinon si "):
+                    condition = ligne_cond[9:].split(" alors")[0]
+                    if not bloc_exécuté and evaluer_expression(condition):
+                        j += 1
+                        while j < len(bloc_complet) and not bloc_complet[j].strip().startswith(("sinon si", "sinon")):
+                            interpreter_lignes([bloc_complet[j]])
+                            j += 1
+                        bloc_exécuté = True
+                        break
+
+                elif ligne_cond.startswith("sinon"):
+                    if not bloc_exécuté:
+                        j += 1
+                        while j < len(bloc_complet):
+                            interpreter_lignes([bloc_complet[j]])
+                            j += 1
+                        break
+
+                j += 1
             continue
 
-        # Variables
+        # --- Variables ---
         if ligne.startswith("var "):
             nom, valeur = ligne[4:].split(" = ")
             variables[nom.strip()] = evaluer_expression(valeur)
 
-        # Affectation
-        elif "=" in ligne and not ligne.startswith(("si ", "tantque ", "pour ")):
+        # --- Affectation ---
+        elif "=" in ligne and not ligne.startswith(("tantque ", "pour ")):
             nom, valeur = ligne.split(" = ")
             variables[nom.strip()] = evaluer_expression(valeur)
 
-        # Affichage
+        # --- Affichage ---
         elif ligne.startswith("montrer ") or ligne.startswith("écrire "):
             contenu = ligne.split(" ", 1)[1]
             print(evaluer_expression(contenu))
 
-        # Condition SI
-        elif ligne.startswith("si "):
-            condition = ligne[3:].split(" alors")[0]
-            if evaluer_expression(condition):
-                pile_blocs.append("si")
-            else:
-                while not lignes[i].strip().startswith(("sinon", "sinon si", "fin")):
-                    i += 1
-                continue
-
-        # SINON SI
-        elif ligne.startswith("sinon si "):
-            if pile_blocs and pile_blocs[-1] == "si":
-                i += 1
-                continue  # Si un "si" a déjà été exécuté, on saute
-            condition = ligne[9:].split(" alors")[0]
-            if evaluer_expression(condition):
-                pile_blocs.append("si")
-            else:
-                while not lignes[i].strip().startswith(("sinon", "fin")):
-                    i += 1
-                continue
-
-        # SINON
-        elif ligne.startswith("sinon"):
-            if pile_blocs and pile_blocs[-1] == "si":
-                i += 1
-                continue  # Si un bloc si a été traité, on saute
-            else:
-                pile_blocs.append("si")
-
-        # FIN (si, boucle, fonction)
-        elif ligne == "fin":
-            if pile_blocs:
-                pile_blocs.pop()
-
-        # Tant que
+        # --- Boucle tantque ---
         elif ligne.startswith("tantque "):
             condition = ligne[8:].split(" faire")[0]
             bloc = []
@@ -98,7 +106,7 @@ def interpreter_lignes(lignes):
             while evaluer_expression(condition):
                 interpreter_lignes(bloc)
 
-        # Fonction - définition
+        # --- Définition de fonction ---
         elif ligne.startswith("fonction "):
             nom_fct = re.findall(r"fonction\s+(\w+)", ligne)[0]
             params = re.findall(r"\((.*?)\)", ligne)
@@ -111,7 +119,7 @@ def interpreter_lignes(lignes):
                 i += 1
             fonctions[nom_fct] = (params, bloc)
 
-        # Appel de fonction
+        # --- Appel de fonction ---
         elif "(" in ligne and ")" in ligne:
             nom_fct = ligne.split("(")[0]
             args = ligne.split("(", 1)[1].rstrip(")").split(",")
@@ -131,10 +139,12 @@ def charger_et_executer(fichier_bgsc):
         lignes = f.readlines()
     interpreter_lignes(lignes)
 
-# Exemple d'exécution : charger_et_executer("exemple.bgsc")
+# Point d'entrée
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 2:
         print("Utilisation : python baguette.py fichier.bgsc")
     else:
         charger_et_executer(sys.argv[1])
+
+
